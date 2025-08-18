@@ -51,3 +51,9 @@ body {
   background: #f5f5f5;
 }
 
+.config {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  padding: 10px;
+}

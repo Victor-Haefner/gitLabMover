@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Simple Config Website</title>
+  <title>Gitlab Mover</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- Toolbar -->
   <div class="toolbar">
     <button>Button 1</button>
     <button>Button 2</button>
@@ -15,19 +14,23 @@
     <button>Button 5</button>
   </div>
 
-  <!-- Panels -->
   <div class="container">
-    <!-- Left Panel -->
     <div class="panel" id="left-panel">
-      <h3>Left Panel</h3>
-      <label>Server Address:</label>
-      <input type="text" data-panel="left" data-key="server"><br>
+      <div class="toolbar">
+        <h3>Source Gitlab</h3>
+        <button onclik="updatePanel" id="leftPanelUpdate">update</button>
+      </div>
       
-      <label>Token:</label>
-      <input type="text" data-panel="left" data-key="token"><br>
+      <div class="config">
+        <label>Server Address:</label>
+        <input type="text" data-panel="left" data-key="server">
       
-      <label>System Path:</label>
-      <input type="text" data-panel="left" data-key="path"><br>
+        <label>Token:</label>
+        <input type="text" data-panel="left" data-key="token">
+      
+        <label>System Path:</label>
+        <input type="text" data-panel="left" data-key="path">
+      </div>
 
       <!-- List view -->
       <div class="list">
@@ -48,15 +51,21 @@
 
     <!-- Right Panel -->
     <div class="panel" id="right-panel">
-      <h3>Right Panel</h3>
-      <label>Server Address:</label>
-      <input type="text" data-panel="right" data-key="server"><br>
+      <div class="toolbar">
+        <h3>Destination Gitlab</h3>
+        <button onclik="updatePanel" id="rightPanelUpdate">update</button>
+      </div>
+
+      <div class="config">
+        <label>Server Address:</label>
+        <input type="text" data-panel="right" data-key="server">
       
-      <label>Token:</label>
-      <input type="text" data-panel="right" data-key="token"><br>
+        <label>Token:</label>
+        <input type="text" data-panel="right" data-key="token">
       
-      <label>System Path:</label>
-      <input type="text" data-panel="right" data-key="path"><br>
+        <label>System Path:</label>
+        <input type="text" data-panel="right" data-key="path">
+      </div>
 
       <!-- List view -->
       <div class="list">

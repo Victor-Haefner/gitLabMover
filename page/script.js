@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const inputs = document.querySelectorAll("input[data-panel]");
 
   // Load config.json on page load
-  fetch("config.json")
+  fetch("load_config.php")
     .then(res => res.json())
     .then(config => {
       inputs.forEach(input => {
@@ -21,12 +21,15 @@ document.addEventListener("DOMContentLoaded", () => {
       let panel = input.dataset.panel;
       let key = input.dataset.key;
       let value = input.value;
-
+      console.log("yay");
       fetch("save_config.php", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ panel, key, value })
-      });
+      })
+      .then(res => res.text())
+      .then(txt => console.log("Save response:", txt))
+      .catch(err => console.error("Save error:", err));
     });
   });
 });
