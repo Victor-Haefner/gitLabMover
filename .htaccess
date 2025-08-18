@@ -1,0 +1,6 @@
+<Files "config.json">
+    # Prevent browsers from reading config.json directly
+    Order allow,deny
+    Deny from all
+</Files>
+
