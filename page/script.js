@@ -50,20 +50,17 @@ class GitLabPanel {
           .catch(err => console.error("Save error:", err));
     }
 
-    // Fetch accessible projects from GitLab
-    /*async fetchProjects() {
+    async fetchProjects() {
         if (!this.server || !this.token) {
             throw new Error("Server or token missing.");
         }
 
         const url = `${this.server}/api/v4/projects?search=${encodeURIComponent(this.projectName)}`;
-        const res = await fetch(url, {
-            headers: { "PRIVATE-TOKEN": this.token }
-        });
+        const res = await fetch(url, { headers: { "PRIVATE-TOKEN": this.token } });
 
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        return await res.json();
-    }*/
+        console.log( await res.json() );
+    }
 }
 
 var panelLeft;
@@ -77,6 +74,11 @@ function setupPanels() {
 function loadConfig(config) {
     panelLeft.loadFromConfig(config);
     panelRight.loadFromConfig(config);
+}
+
+function updatePanel(pID) {
+    if (pID == "left") panelLeft.fetchProjects();
+    if (pID == "right") panelRight.fetchProjects();
 }
 
 setupPanels();
