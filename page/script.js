@@ -11,6 +11,10 @@ class GitLabPanel {
         this.tokenInput   = document.querySelector(`#${this.panelDivId} input[data-key="token"]`);
         this.pathInput    = document.querySelector(`#${this.panelDivId} input[data-key="path"]`);
         
+        this.filterName   = document.querySelector(`#${this.panelDivId} input[data-key="filter-name"]`);
+        this.filterPath   = document.querySelector(`#${this.panelDivId} input[data-key="filter-path"]`);
+        this.filters = [this.filterName, this.filterPath];
+        
         this.projectsList = document.querySelector(`#${this.panelDivId} div[data-key="projects"]`);
       
         [this.serverInput, this.tokenInput, this.projectInput].forEach(input => {
@@ -20,9 +24,36 @@ class GitLabPanel {
             }
         });
         
+        this.filters.forEach(input => {
+            if (input) {
+                input.addEventListener("input", () => this.updateFilter(input));
+                //input.addEventListener("change", () => this.updateFilter(input));
+            }
+        });
+        
         this.clearProjects();
     }
+    
+    checkMatch(a,b) {
+    	if (b.length < 3) return true;
+	return a.toLowerCase().includes(b.toLowerCase());
+    }
 
+    updateFilter(input) {
+        this.filters.forEach(other => { if (input != other) other.value = ""; });
+        
+        var v = input.value;
+        
+        let filterIndex = 0; // name
+        if (input == this.filterPath) filterIndex = 2; // path
+        
+        console.log("filter", v);
+	for (const row of this.projectsList.children) {
+		let match = this.checkMatch(row.children[filterIndex].innerHTML, v);
+		row.style.display = match ? "flex" : "none";
+	}
+    }
+    
     updateFromInputs() {
         this.server = this.serverInput?.value || "";
         this.token = this.tokenInput?.value || "";

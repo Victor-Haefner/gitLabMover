@@ -57,3 +57,10 @@ body {
   gap: 10px;
   padding: 10px;
 }
+
+.filters {
+  display: grid;
+  grid-template-columns: auto 1fr auto 1fr;
+  gap: 20px;
+  padding: 20px;
+}
