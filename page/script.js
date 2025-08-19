@@ -37,6 +37,21 @@ class GitLabPanel {
         this.clearProjects();
     }
     
+    exportProject() {
+    	if (this.selected == undefined) return;
+    	
+    	let pID = this.selected.children[1].innerHTML;
+    	
+        fetch("fetch_project.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ "projectID": pID, "token": this.token, "server": this.server })
+        })
+          .then( res => res.text())
+          .then( txt => console.log("Export response:", txt))
+          .catch(err => console.error("Export error:", err));
+    }
+    
     checkMatch(a,b) {
     	if (b.length < 3) return true;
 	return a.toLowerCase().includes(b.toLowerCase());
@@ -82,7 +97,7 @@ class GitLabPanel {
         fetch("save_config.php", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ panel: input.dataset.panel, key: input.dataset.key, value: input.value })
+            body: JSON.stringify({ "panel": input.dataset.panel, "key": input.dataset.key, "value": input.value })
         })
           .then( res => res.text())
           .then( txt => console.log("Save response:", txt))
@@ -163,7 +178,7 @@ class GitLabPanel {
 		if (!nextPage) break; // no more pages
 		page = parseInt(nextPage, 10);
 		
-		//break; // for testing
+		break; // for testing
         }
     }
     
@@ -186,6 +201,10 @@ function loadConfig(config) {
 function updatePanel(pID) {
     if (pID == "left") panelLeft.fetchProjects();
     if (pID == "right") panelRight.fetchProjects();
+}
+
+function exportProject() {
+    panelLeft.exportProject();
 }
 
 setupPanels();
