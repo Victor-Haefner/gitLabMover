@@ -6,6 +6,9 @@ class GitLabPanel {
         this.token = "";
         
 	this.projects = [];
+	
+	this.selected = undefined;
+	this.highlighted = undefined;
 
         this.serverInput  = document.querySelector(`#${this.panelDivId} input[data-key="server"]`);
         this.tokenInput   = document.querySelector(`#${this.panelDivId} input[data-key="token"]`);
@@ -86,9 +89,37 @@ class GitLabPanel {
           .catch(err => console.error("Save error:", err));
     }
     
-    addRow(type, cells) {
+    findRow(name) {
+	for (const row of this.projectsList.children) {
+		if (row.children[0].innerHTML == name) return row;
+	}
+    	return undefined;
+    }
+    
+    otherPanel() {
+    	if (this.panelId == "left") return panelRight;
+    	if (this.panelId == "right") return panelLeft;
+    }
+    
+    highlightRow(name) {
+    	if (this.highlighted != undefined) this.highlighted.classList.remove("highlighted");
+    	this.highlighted = this.findRow(name);
+    	if (this.highlighted != undefined) this.highlighted.classList.add("highlighted");
+    }
+    
+    onSelectRow(panel, row) {
+    	if (panel.selected != undefined) panel.selected.classList.remove("selected");
+    	panel.selected = row;
+    	panel.selected.classList.add("selected");
+    	let name = row.children[0].innerHTML;
+    	let other = panel.otherPanel();
+    	other.highlightRow(name);
+    }
+    
+    addRow(type, cells, cb) {
     	let row = document.createElement('div');
     	row.className = type;
+    	if (cb) row.onclick = (event) => cb(this, row);
     	this.projectsList.appendChild(row);
     	
     	cells.forEach(cell => {
@@ -100,14 +131,13 @@ class GitLabPanel {
     
     clearProjects() {
     	this.projectsList.innerHTML = "";
-    	this.addRow("row header", ["Project", "ID", "Path", "Owner", "Created"]);
+    	this.addRow("row header", ["Project", "ID", "Path", "Owner", "Created"], undefined);
     }
     
     addProject(data) {
-    	console.log(data);
     	let owner = data["owner"] ? data["owner"]["name"] : "unknown";
     	let path = data["namespace"]["full_path"]
-    	this.addRow("row", [data["name"], data["id"], path, owner, data["created_at"]]);
+    	this.addRow("row", [data["name"], data["id"], path, owner, data["created_at"]], this.onSelectRow);
     }
 
     async fetchProjects() {
@@ -133,6 +163,8 @@ class GitLabPanel {
 		break; // for testing
         }
     }
+    
+    
 }
 
 var panelLeft;
@@ -163,6 +195,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // TODO
-//  - add name and path filters to filter the projects displayed
 //  - when clicking on a project left/right, highlight the same named project on the other side
 //  - add stats, total number of projects for example

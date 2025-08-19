@@ -46,6 +46,14 @@ body {
   border-right: none;
 }
 
+.highlighted {
+  background: #ccc !important;
+}
+
+.selected {
+  background: #abf !important;
+}
+
 .header {
   font-weight: bold;
   background: #f5f5f5;
