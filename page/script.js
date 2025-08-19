@@ -1,39 +1,35 @@
 class GitLabPanel {
     constructor(panelId) {
         this.panelId = panelId;
+        this.panelDivId = panelId+"-panel";
         this.server = "";
         this.token = "";
         this.projectName = "";
 
-        // Grab inputs inside this panel
-        this.serverInput  = document.querySelector(`#${panelId} input[data-key="server"]`);
-        this.tokenInput   = document.querySelector(`#${panelId} input[data-key="token"]`);
-        this.pathInput    = document.querySelector(`#${panelId} input[data-key="path"]`);
-        this.projectInput = document.querySelector(`#${panelId} input[data-key="project"]`);
-
-        // Attach listeners
+        this.serverInput  = document.querySelector(`#${this.panelDivId} input[data-key="server"]`);
+        this.tokenInput   = document.querySelector(`#${this.panelDivId} input[data-key="token"]`);
+        this.pathInput    = document.querySelector(`#${this.panelDivId} input[data-key="path"]`);
+      
         [this.serverInput, this.tokenInput, this.projectInput].forEach(input => {
             if (input) {
                 input.addEventListener("input", () => this.updateFromInputs());
+                input.addEventListener("change", () => this.saveConfig(input));
             }
         });
     }
 
-    // Sync class members with input values
     updateFromInputs() {
         this.server = this.serverInput?.value || "";
         this.token = this.tokenInput?.value || "";
         this.projectName = this.projectInput?.value || "";
     }
 
-    // Sync inputs with class members
     updateInputs() {
         if (this.serverInput) this.serverInput.value = this.server;
         if (this.tokenInput) this.tokenInput.value = this.token;
         if (this.projectInput) this.projectInput.value = this.projectName;
     }
 
-    // Load initial values from config object
     loadFromConfig(config) {
         if (config[this.panelId]) {
             this.server = config[this.panelId].server || "";
@@ -42,62 +38,57 @@ class GitLabPanel {
             this.updateInputs();
         }
     }
+    
+    saveConfig(input) {
+        fetch("save_config.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ panel: input.dataset.panel, key: input.dataset.key, value: input.value })
+        })
+          .then(res => res.text())
+          .then(txt => console.log("Save response:", txt))
+          .catch(err => console.error("Save error:", err));
+    }
 
     // Fetch accessible projects from GitLab
-    async fetchProjects() {
+    /*async fetchProjects() {
         if (!this.server || !this.token) {
             throw new Error("Server or token missing.");
         }
 
-        const url = `${this.server}/api/v4/projects?search=${encodeURICom
+        const url = `${this.server}/api/v4/projects?search=${encodeURIComponent(this.projectName)}`;
         const res = await fetch(url, {
             headers: { "PRIVATE-TOKEN": this.token }
         });
 
         if (!res.ok) throw new Error(`HTTP error ${res.status}`);
         return await res.json();
-    }
+    }*/
 }
 
+var panelLeft;
+var panelRight;
 
+function setupPanels() {
+    panelLeft  = new GitLabPanel("left");
+    panelRight = new GitLabPanel("right");
+}
+
+function loadConfig(config) {
+    panelLeft.loadFromConfig(config);
+    panelRight.loadFromConfig(config);
+}
+
+setupPanels();
 
 document.addEventListener("DOMContentLoaded", () => {
-  const inputs = document.querySelectorAll("input[data-panel]");
-
-  // Load config.json on page load
   fetch("load_config.php")
     .then(res => res.json())
-    .then(config => {
-      inputs.forEach(input => {
-        let panel = input.dataset.panel;
-        let key = input.dataset.key;
-        if (config[panel] && config[panel][key]) {
-          input.value = config[panel][key];
-        }
-      });
-    })
+    .then(config => loadConfig(config))
     .catch(() => console.log("No config yet."));
-
-  // Save on input change
-  inputs.forEach(input => {
-    input.addEventListener("change", () => {
-      let panel = input.dataset.panel;
-      let key = input.dataset.key;
-      let value = input.value;
-      console.log("yay");
-      fetch("save_config.php", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ panel, key, value })
-      })
-      .then(res => res.text())
-      .then(txt => console.log("Save response:", txt))
-      .catch(err => console.error("Save error:", err));
-    });
-  });
 });
 
-function updatePanel() { // TODO
+/*function updatePanel() { // TODO
     const server = document.getElementById("gitlab-server").value;
     const token  = document.getElementById("gitlab-token").value;
     const projectName = document.getElementById("project-name").value;
@@ -123,4 +114,4 @@ function updatePanel() { // TODO
         console.error(err);
         document.getElementById("project-output").textContent = "Error fetching projects: " + err;
     }
-});
+});*/
