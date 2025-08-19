@@ -104,7 +104,10 @@ class GitLabPanel {
     highlightRow(name) {
     	if (this.highlighted != undefined) this.highlighted.classList.remove("highlighted");
     	this.highlighted = this.findRow(name);
-    	if (this.highlighted != undefined) this.highlighted.classList.add("highlighted");
+    	if (this.highlighted != undefined) {
+    		this.highlighted.classList.add("highlighted");
+    		this.highlighted.scrollIntoView({ behavior: "auto", block: "nearest" });
+    	}
     }
     
     onSelectRow(panel, row) {
@@ -160,7 +163,7 @@ class GitLabPanel {
 		if (!nextPage) break; // no more pages
 		page = parseInt(nextPage, 10);
 		
-		break; // for testing
+		//break; // for testing
         }
     }
     
@@ -195,5 +198,9 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // TODO
-//  - when clicking on a project left/right, highlight the same named project on the other side
+//  - add project port, maybe a status?
 //  - add stats, total number of projects for example
+
+
+
+

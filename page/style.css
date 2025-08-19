@@ -1,6 +1,7 @@
 body {
   margin: 0;
   font-family: sans-serif;
+  height: 100vh;
 }
 
 .toolbar {
@@ -21,6 +22,7 @@ body {
   padding: 10px;
   box-sizing: border-box;
   border-right: 1px solid #ddd;
+  height: 100%;
 }
 
 .panel:last-child {
@@ -29,6 +31,9 @@ body {
 
 .list {
   margin-top: 20px;
+  height: 80%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .row {
