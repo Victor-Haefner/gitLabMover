@@ -6,6 +6,7 @@ class GitLabPanel {
         this.token = "";
         
 	this.projects = [];
+        this.path = "";
 	
 	this.selected = undefined;
 	this.highlighted = undefined;
@@ -20,7 +21,7 @@ class GitLabPanel {
         
         this.projectsList = document.querySelector(`#${this.panelDivId} div[data-key="projects"]`);
       
-        [this.serverInput, this.tokenInput, this.projectInput].forEach(input => {
+        [this.serverInput, this.tokenInput, this.pathInput].forEach(input => {
             if (input) {
                 input.addEventListener("input", () => this.updateFromInputs());
                 input.addEventListener("change", () => this.saveConfig(input));
@@ -35,6 +36,17 @@ class GitLabPanel {
         });
         
         this.clearProjects();
+    }
+    
+    importProject(pID, pName) {    	
+        fetch("import_project.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ "projectID": pID, "namespace": this.path, "owner": "victor", "name": pName })
+        })
+          .then( res => res.text())
+          .then( txt => console.log("Import response:", txt))
+          .catch(err => console.error("Import error:", err));
     }
     
     exportProject() {
@@ -75,20 +87,21 @@ class GitLabPanel {
     updateFromInputs() {
         this.server = this.serverInput?.value || "";
         this.token = this.tokenInput?.value || "";
-        this.projectName = this.projectInput?.value || "";
+        this.pathInput = this.pathInput?.value || "";
     }
 
     updateInputs() {
         if (this.serverInput) this.serverInput.value = this.server;
         if (this.tokenInput) this.tokenInput.value = this.token;
-        if (this.projectInput) this.projectInput.value = this.projectName;
+        if (this.pathInput) this.pathInput.value = this.path;
     }
 
     loadFromConfig(config) {
+    	console.log(config);
         if (config[this.panelId]) {
             this.server = config[this.panelId].server || "";
             this.token = config[this.panelId].token || "";
-            this.projectName = config[this.panelId].project || "";
+            this.path = config[this.panelId].path || "";
             this.updateInputs();
         }
     }
@@ -205,6 +218,13 @@ function updatePanel(pID) {
 
 function exportProject() {
     panelLeft.exportProject();
+}
+
+function importProject() {
+    if (panelLeft.selected == undefined) return;
+    let pName = panelLeft.selected.children[0].innerHTML;
+    let pID = panelLeft.selected.children[1].innerHTML;
+    panelRight.importProject(pID, pName);
 }
 
 setupPanels();

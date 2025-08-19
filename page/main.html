@@ -20,12 +20,12 @@
         <h3>Source Gitlab</h3>
         <button onclick="updatePanel('left')" id="leftPanelUpdate">update</button>
         <button onclick="exportProject()" id="leftPanelExport">export</button>
+        <button onclick="importProject()" id="leftPanelImport">import</button>
       </div>
       
       <div class="config">
         <label>Server Address:</label> <input type="text" data-panel="left" data-key="server">
         <label>Token:</label> <input type="text" data-panel="left" data-key="token">
-        <label>System Path:</label> <input type="text" data-panel="left" data-key="path">
       </div>
       
       <div class="filters">
@@ -46,7 +46,7 @@
       <div class="config">
         <label>Server Address:</label> <input type="text" data-panel="right" data-key="server">
         <label>Token:</label> <input type="text" data-panel="right" data-key="token">
-        <label>System Path:</label> <input type="text" data-panel="right" data-key="path">
+        <label>Import Group:</label> <input type="text" data-panel="right" data-key="path">
       </div>
       
       <div class="filters">
