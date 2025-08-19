@@ -4,11 +4,14 @@ class GitLabPanel {
         this.panelDivId = panelId+"-panel";
         this.server = "";
         this.token = "";
-        this.projectName = "";
+        
+	this.projects = [];
 
         this.serverInput  = document.querySelector(`#${this.panelDivId} input[data-key="server"]`);
         this.tokenInput   = document.querySelector(`#${this.panelDivId} input[data-key="token"]`);
         this.pathInput    = document.querySelector(`#${this.panelDivId} input[data-key="path"]`);
+        
+        this.projectsList = document.querySelector(`#${this.panelDivId} div[data-key="projects"]`);
       
         [this.serverInput, this.tokenInput, this.projectInput].forEach(input => {
             if (input) {
@@ -16,6 +19,8 @@ class GitLabPanel {
                 input.addEventListener("change", () => this.saveConfig(input));
             }
         });
+        
+        this.clearProjects();
     }
 
     updateFromInputs() {
@@ -45,21 +50,57 @@ class GitLabPanel {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ panel: input.dataset.panel, key: input.dataset.key, value: input.value })
         })
-          .then(res => res.text())
-          .then(txt => console.log("Save response:", txt))
+          .then( res => res.text())
+          .then( txt => console.log("Save response:", txt))
           .catch(err => console.error("Save error:", err));
+    }
+    
+    addRow(type, cells) {
+    	let row = document.createElement('div');
+    	row.className = type;
+    	this.projectsList.appendChild(row);
+    	
+    	cells.forEach(cell => {
+    		let c = document.createElement('div');
+    		row.appendChild(c);
+    		c.innerHTML = cell;
+    	});
+    }
+    
+    clearProjects() {
+    	this.projectsList.innerHTML = "";
+    	this.addRow("row header", ["Project", "ID", "Path", "Owner", "Created"]);
+    }
+    
+    addProject(data) {
+    	console.log(data);
+    	let owner = data["owner"] ? data["owner"]["name"] : "unknown";
+    	let path = data["namespace"]["full_path"]
+    	this.addRow("row", [data["name"], data["id"], path, owner, data["created_at"]]);
     }
 
     async fetchProjects() {
         if (!this.server || !this.token) {
             throw new Error("Server or token missing.");
         }
-
-        const url = `${this.server}/api/v4/projects?search=${encodeURIComponent(this.projectName)}`;
-        const res = await fetch(url, { headers: { "PRIVATE-TOKEN": this.token } });
-
-        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
-        console.log( await res.json() );
+        
+        this.clearProjects();
+	let page = 1;
+	
+	while(true) {
+		const url = `${this.server}/api/v4/projects?per_page=20&page=${page}`;
+		const res = await fetch(url, { headers: { "PRIVATE-TOKEN": this.token } });
+		if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+		
+		let data = await res.json();
+		data.forEach(row => { this.addProject(row); });
+		
+		const nextPage = res.headers.get("X-Next-Page");
+		if (!nextPage) break; // no more pages
+		page = parseInt(nextPage, 10);
+		
+		break; // for testing
+        }
     }
 }
 
@@ -90,30 +131,7 @@ document.addEventListener("DOMContentLoaded", () => {
     .catch(() => console.log("No config yet."));
 });
 
-/*function updatePanel() { // TODO
-    const server = document.getElementById("gitlab-server").value;
-    const token  = document.getElementById("gitlab-token").value;
-    const projectName = document.getElementById("project-name").value;
-
-    if (!server || !token) {
-        alert("Please provide GitLab server and token.");
-        return;
-    }
-
-    try {
-        const response = await fetch(`${server}/api/v4/projects?search=${encodeURIComponent(projectName)}`, {
-            headers: {
-                "PRIVATE-TOKEN": token
-            }
-        });
-
-        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
-
-        const projects = await response.json();
-        document.getElementById("project-output").textContent = JSON.stringify(projects, null, 2);
-
-    } catch (err) {
-        console.error(err);
-        document.getElementById("project-output").textContent = "Error fetching projects: " + err;
-    }
-});*/
+// TODO
+//  - add name and path filters to filter the projects displayed
+//  - when clicking on a project left/right, highlight the same named project on the other side
+//  - add stats, total number of projects for example
