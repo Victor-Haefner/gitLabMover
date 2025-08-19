@@ -27,7 +27,7 @@ try {
         escapeshellarg($path)
     );
     
-    $cmd = './gitlab-rake-wrapper.sh "gitlab:env:info"'; // for testing
+    $cmd = 'sudo -u gitlab /usr/bin/gitlab-rake "gitlab:env:info"'; // for testing
     
     echo "executing: $cmd\n";
     $output = shell_exec($cmd);
