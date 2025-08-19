@@ -1,7 +1,7 @@
 <?php
 
 // needs:
-//  sudo apt install php8.3-curl
+//  sudo apt install php8.1-curl
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
